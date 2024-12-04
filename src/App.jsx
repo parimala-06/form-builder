@@ -4,17 +4,17 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import { Button } from "./components/ui/button";
 import Catogorize from "./components/form-editor/catogorize";
+import Comprehension from "./components/form-editor/comprehension";
+import Cloze from "./components/form-editor/cloze";
+import QuestionCard from "./components/form-editor/question-card";
+import FormBuilderPage from "./page/form-builder";
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen">
-      {/* <h1 className="text-3xl font-bold underline text-blue-700">
-        Hello world!
-      </h1>
-      <Button>Click me</Button> */}
-      <Catogorize />
+    <div className="w-full">
+      <FormBuilderPage />
     </div>
   );
 }
