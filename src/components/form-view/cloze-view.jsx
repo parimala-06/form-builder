@@ -79,9 +79,9 @@ const ClozeView = ({ clozeData }) => {
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Cloze Activity</h1>
-        <div className="mb-6">
+      <div className="p-4">
+        {/* <h1 className="text-2xl font-bold mb-4">Cloze Activity</h1> */}
+        <div className="mb-4">
           {sentenceParts.map((part, index) => {
             if (index % 2 === 1) {
               const blankId = `blank-${blankCounter}`;

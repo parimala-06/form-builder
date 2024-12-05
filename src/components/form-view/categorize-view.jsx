@@ -316,10 +316,10 @@ const CategorizeView = ({ categorizeData }) => {
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <h1 className="text-2xl font-bold text-center mb-6">
+      {/* <h1 className="text-2xl font-bold text-center mb-6">
         Categorize the Following
-      </h1>
-      <div className="flex flex-wrap gap-4 justify-center mb-6">
+      </h1> */}
+      <div className="flex flex-wrap gap-4 justify-center mb-4">
         {allItems.map((item) => (
           <DraggableItem key={item.id} id={item.id}>
             {item.id}

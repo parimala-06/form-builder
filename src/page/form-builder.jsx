@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import QuestionCard from "@/components/form-editor/question-card"; // Adjust import path if necessary
 
 const FormBuilderPage = () => {
+  const navigate = useNavigate();
+
   const [questionCards, setQuestionCards] = useState([{ id: 0, data: {} }]);
 
   // Add a new question card
@@ -38,6 +41,9 @@ const FormBuilderPage = () => {
     setQuestionCards([]); // Reset to one default card
   };
 
+  const handleNavigate = () => {
+    navigate("/view");
+  };
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -52,7 +58,10 @@ const FormBuilderPage = () => {
               Add Question
             </button>
             <button
-              onClick={handleSave}
+              onClick={() => {
+                handleSave(); // Call the save function
+                handleNavigate(); // Call the navigate function
+              }}
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
             >
               Save

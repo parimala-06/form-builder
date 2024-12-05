@@ -12,7 +12,6 @@ import { Card } from "@/components/ui/card";
 import Categorize from "./catogorize";
 import Cloze from "./cloze";
 import Comprehension from "./comprehension";
-import { Button } from "../ui/button";
 
 const QuestionCard = ({ onDataChange }) => {
   const [questionData, setQuestionData] = useState({
@@ -20,6 +19,7 @@ const QuestionCard = ({ onDataChange }) => {
     mediaType: "None",
     points: "",
     title: "",
+    picture: "",
     description: "",
     categorizeData: { categories: [], items: [] },
     clozeData: { sentence: [], options: [], feedback: [] },
@@ -96,6 +96,31 @@ const QuestionCard = ({ onDataChange }) => {
           />
         </div>
       </div>
+
+      {
+        /* Image Upload Field */
+        questionData.mediaType === "Image" ? (
+          <>
+            <div className="mb-4">
+              <Label
+                htmlFor="picture"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Upload Image here
+              </Label>
+              <Input
+                id="picture"
+                type="file"
+                value={questionData.picture}
+                onChange={(e) => handleChange("picture", e.target.value)}
+                className="mt-1 w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+          </>
+        ) : (
+          <></>
+        )
+      }
 
       {/* Title Input */}
       <div className="mb-4">
