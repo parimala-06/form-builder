@@ -48,8 +48,7 @@ const DroppableBlank = ({ id, children }) => {
     </div>
   );
 };
-
-const ClozeView = ({ clozeData }) => {
+const ClozeView = ({ clozeData, onAnswerChange }) => {
   const { sentence, options } = clozeData;
 
   const [droppedItems, setDroppedItems] = React.useState({});
@@ -61,31 +60,38 @@ const ClozeView = ({ clozeData }) => {
       const droppedOption = options.find((opt) => opt.id === active.id);
       const blankPosition = over.id;
 
-      // Log the blank and option details
-      console.log(
-        `Option "${droppedOption.content}" was placed in blank "${blankPosition}"`
-      );
-
       // Update the droppedItems state
-      setDroppedItems((prev) => ({
-        ...prev,
-        [blankPosition]: active.id,
-      }));
+      setDroppedItems((prev) => {
+        const updatedDroppedItems = {
+          ...prev,
+          [blankPosition]: active.id,
+        };
+
+        // Send updated answers back to parent component
+        const updatedAnswers = Object.keys(updatedDroppedItems).map((key) => ({
+          blank: key,
+          answer: options.find((opt) => opt.id === updatedDroppedItems[key])
+            .content,
+        }));
+
+        onAnswerChange(updatedAnswers);
+
+        return updatedDroppedItems;
+      });
     }
   };
 
-  const sentenceParts = sentence.split(/<u>(.*?)<\/u>/);
-  let blankCounter = 0; // Counter for numbering blanks
+  const sentenceParts = sentence[0].split(/<u>(.*?)<\/u>/);
+  let blankCounter = 0;
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <div className="p-4">
-        {/* <h1 className="text-2xl font-bold mb-4">Cloze Activity</h1> */}
         <div className="mb-4">
           {sentenceParts.map((part, index) => {
             if (index % 2 === 1) {
               const blankId = `blank-${blankCounter}`;
-              blankCounter++; // Increment blank counter
+              blankCounter++;
 
               return (
                 <DroppableBlank key={blankId} id={blankId}>

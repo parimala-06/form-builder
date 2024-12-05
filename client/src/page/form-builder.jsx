@@ -5,14 +5,14 @@ import QuestionCard from "@/components/form-editor/question-card"; // Adjust imp
 const FormBuilderPage = () => {
   const navigate = useNavigate();
 
-  const [questionCards, setQuestionCards] = useState([{ id: 0, data: {} }]);
+  // State to track question cards and next unique ID
+  const [questionCards, setQuestionCards] = useState([{ id: 1, data: {} }]);
+  const [nextQuestionId, setNextQuestionId] = useState(2); // Start IDs from 2 since the first question has ID 1
 
-  // Add a new question card
+  // Add a new question card with a unique ID
   const handleAddQuestion = () => {
-    setQuestionCards([
-      ...questionCards,
-      { id: questionCards.length, data: {} },
-    ]);
+    setQuestionCards([...questionCards, { id: nextQuestionId, data: {} }]);
+    setNextQuestionId(nextQuestionId + 1); // Increment the next ID
   };
 
   // Remove a question card
@@ -28,22 +28,65 @@ const FormBuilderPage = () => {
     setQuestionCards(updatedCards);
   };
 
-  // Log all question data
-  const handleSave = () => {
-    console.log(
-      "All Question Data:",
-      questionCards.map((card) => card.data)
-    );
-    alert("Questions saved!");
-  };
+  // Save question data to MongoDB through the server
+  const handleSave = async () => {
+    try {
+      const payload = {
+        questions: questionCards.map((card, index) => ({
+          questionId: card.id || index + 1,
+          title: card.data.title,
+          questionType: card.data.questionType || "None",
+          mediaType: card.data.mediaType || "None",
+          points: card.data.points || 0,
+          picture: card.data.picture || "",
+          description: card.data.description || "",
+          categorizeData: card.data.categorizeData || {
+            categories: [],
+            items: [],
+          },
+          clozeData: card.data.clozeData || {
+            sentence: [],
+            options: [],
+            feedback: [],
+          },
+          compData: card.data.compData || [],
+          answers: card.data.answers || [],
+        })),
+      };
 
-  const handleCancel = () => {
-    setQuestionCards([]); // Reset to one default card
+      console.log("Payload to be sent:", payload);
+
+      const response = await fetch("http://localhost:3000/api/save-questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert("Questions saved successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Save failed:", errorData);
+        alert("Failed to save questions.");
+      }
+    } catch (error) {
+      console.error("Error saving questions:", error);
+      alert("An error occurred while saving questions.");
+    }
   };
 
   const handleNavigate = () => {
+    handleSave(); // Save data before navigating
     navigate("/view");
   };
+
+  const handleCancel = () => {
+    setQuestionCards([{ id: 1, data: {} }]); // Reset to the initial default card
+    setNextQuestionId(2); // Reset the next ID
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -58,10 +101,7 @@ const FormBuilderPage = () => {
               Add Question
             </button>
             <button
-              onClick={() => {
-                handleSave(); // Call the save function
-                handleNavigate(); // Call the navigate function
-              }}
+              onClick={handleNavigate}
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
             >
               Save
@@ -95,6 +135,7 @@ const FormBuilderPage = () => {
               &times;
             </button>
             <QuestionCard
+              questionId={card.id} // Pass the unique ID to the QuestionCard
               onDataChange={(data) => handleQuestionDataChange(card.id, data)}
             />
           </div>
