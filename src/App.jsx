@@ -8,6 +8,7 @@ import Comprehension from "./components/form-editor/comprehension";
 import Cloze from "./components/form-editor/cloze";
 import QuestionCard from "./components/form-editor/question-card";
 import FormBuilderPage from "./page/form-builder";
+import FormView from "./page/form-view";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -15,6 +16,7 @@ function App() {
   return (
     <div className="w-full">
       <FormBuilderPage />
+      <FormView />
     </div>
   );
 }

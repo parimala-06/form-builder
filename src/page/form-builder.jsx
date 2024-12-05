@@ -2,22 +2,40 @@ import React, { useState } from "react";
 import QuestionCard from "@/components/form-editor/question-card"; // Adjust import path if necessary
 
 const FormBuilderPage = () => {
-  const [questionCards, setQuestionCards] = useState([{ id: 0 }]);
+  const [questionCards, setQuestionCards] = useState([{ id: 0, data: {} }]);
 
+  // Add a new question card
   const handleAddQuestion = () => {
-    setQuestionCards([...questionCards, { id: questionCards.length }]);
+    setQuestionCards([
+      ...questionCards,
+      { id: questionCards.length, data: {} },
+    ]);
   };
 
+  // Remove a question card
   const handleRemoveQuestion = (id) => {
     setQuestionCards(questionCards.filter((card) => card.id !== id));
   };
 
+  // Update question data for a specific card
+  const handleQuestionDataChange = (id, data) => {
+    const updatedCards = questionCards.map((card) =>
+      card.id === id ? { ...card, data } : card
+    );
+    setQuestionCards(updatedCards);
+  };
+
+  // Log all question data
   const handleSave = () => {
+    console.log(
+      "All Question Data:",
+      questionCards.map((card) => card.data)
+    );
     alert("Questions saved!");
   };
 
   const handleCancel = () => {
-    setQuestionCards([{ id: 0 }]); // Reset to one default card
+    setQuestionCards([]); // Reset to one default card
   };
 
   return (
@@ -63,11 +81,13 @@ const FormBuilderPage = () => {
             {/* Remove Button */}
             <button
               onClick={() => handleRemoveQuestion(card.id)}
-              className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+              className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center pb-1"
             >
               &times;
             </button>
-            <QuestionCard />
+            <QuestionCard
+              onDataChange={(data) => handleQuestionDataChange(card.id, data)}
+            />
           </div>
         ))}
       </main>

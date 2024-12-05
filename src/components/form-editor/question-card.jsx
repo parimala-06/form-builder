@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectItem,
@@ -6,56 +6,34 @@ import {
   SelectContent,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import Categorize from "./catogorize";
 import Cloze from "./cloze";
 import Comprehension from "./comprehension";
+import { Button } from "../ui/button";
 
-const QuestionCard = () => {
-  const [questionType, setQuestionType] = useState("None");
-  const [mediaType, setMediaType] = useState("None");
-  const [points, setPoints] = useState("");
-  const [picture, setPicture] = useState("");
-  const [categorizeData, setCategorizeData] = useState({
-    categories: [],
-    items: [],
-  });
-  const [clozeData, setClozeData] = useState({
-    sentence: [],
-    options: [],
-    feedback: [],
+const QuestionCard = ({ onDataChange }) => {
+  const [questionData, setQuestionData] = useState({
+    questionType: "None",
+    mediaType: "None",
+    points: "",
+    title: "",
+    description: "",
+    categorizeData: { categories: [], items: [] },
+    clozeData: { sentence: [], options: [], feedback: [] },
+    compData: [],
   });
 
-  // Handle changes for the dropdown (question type)
-  const handleQuestionTypeChange = (value) => {
-    setQuestionType(value);
-  };
+  // Sync questionData with the parent component
+  useEffect(() => {
+    onDataChange(questionData);
+  }, [questionData]);
 
-  const handleMediaTypeChange = (value) => {
-    setMediaType(value);
-  };
-
-  const handleImageChange = (e) => {
-    setPicture(e.target.value);
-  };
-
-  // Handle changes for the points input
-  const handlePointsChange = (e) => {
-    setPoints(e.target.value);
-  };
-  const logData = () => {
-    console.log({
-      questionType,
-      mediaType,
-      points,
-      title,
-      description,
-      categorizeData,
-      clozeData,
-    });
+  // Handlers to update questionData
+  const handleChange = (field, value) => {
+    setQuestionData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -68,9 +46,12 @@ const QuestionCard = () => {
           <Label className="block text-sm font-medium text-gray-700">
             Question Type
           </Label>
-          <Select value={questionType} onValueChange={handleQuestionTypeChange}>
+          <Select
+            value={questionData.questionType}
+            onValueChange={(value) => handleChange("questionType", value)}
+          >
             <SelectTrigger className="mt-1 w-full p-2 border border-gray-300 rounded-md">
-              {questionType}
+              {questionData.questionType}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Categorize">Categorize</SelectItem>
@@ -84,9 +65,12 @@ const QuestionCard = () => {
           <Label className="block text-sm font-medium text-gray-700">
             Media Type
           </Label>
-          <Select value={mediaType} onValueChange={handleMediaTypeChange}>
+          <Select
+            value={questionData.mediaType}
+            onValueChange={(value) => handleChange("mediaType", value)}
+          >
             <SelectTrigger className="mt-1 w-full p-2 border border-gray-300 rounded-md">
-              {mediaType}
+              {questionData.mediaType}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="None">None</SelectItem>
@@ -106,37 +90,12 @@ const QuestionCard = () => {
           <Input
             id="points"
             type="number"
-            value={points}
-            onChange={handlePointsChange}
+            value={questionData.points}
+            onChange={(e) => handleChange("points", e.target.value)}
             className="mt-1 w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
       </div>
-
-      {
-        /* Image Upload Field */
-        mediaType === "Image" ? (
-          <>
-            <div className="mb-4">
-              <Label
-                htmlFor="picture"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Upload Image here
-              </Label>
-              <Input
-                id="picture"
-                type="file"
-                value={picture}
-                onChange={handleImageChange}
-                className="mt-1 w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          </>
-        ) : (
-          <></>
-        )
-      }
 
       {/* Title Input */}
       <div className="mb-4">
@@ -148,7 +107,8 @@ const QuestionCard = () => {
         </Label>
         <Input
           id="title"
-          rows="4"
+          value={questionData.title}
+          onChange={(e) => handleChange("title", e.target.value)}
           className="mt-1 w-full p-2 border border-gray-300 rounded-md"
           placeholder="Enter the Title here..."
         />
@@ -160,27 +120,34 @@ const QuestionCard = () => {
           htmlFor="description"
           className="block text-sm font-medium text-gray-700"
         >
-          {questionType === "Comprehension"
+          {questionData.questionType === "Comprehension"
             ? `Comprehension Passage`
             : `Description`}
         </Label>
         <Textarea
           id="description"
           rows="4"
+          value={questionData.description}
+          onChange={(e) => handleChange("description", e.target.value)}
           className="mt-1 w-full p-2 border border-gray-300 rounded-md"
           placeholder="Enter the question description here..."
         ></Textarea>
       </div>
-      {questionType === "Categorize" ? (
-        <Categorize onCategorizeChange={setCategorizeData} />
-      ) : questionType === "Cloze" ? (
-        <Cloze onClozeChange={setClozeData} />
-      ) : questionType === "Comprehension" ? (
-        <Comprehension />
+
+      {/* Dynamic Component Based on Question Type */}
+      {questionData.questionType === "Categorize" ? (
+        <Categorize
+          onCategorizeChange={(data) => handleChange("categorizeData", data)}
+        />
+      ) : questionData.questionType === "Cloze" ? (
+        <Cloze onClozeChange={(data) => handleChange("clozeData", data)} />
+      ) : questionData.questionType === "Comprehension" ? (
+        <Comprehension
+          onCompChange={(data) => handleChange("compData", data)}
+        />
       ) : (
-        <div className="text-center ">Choose a question type</div>
+        <div className="text-center">Choose a question type</div>
       )}
-      <Button onClick={logData}>Log Question Data</Button>
     </Card>
   );
 };
